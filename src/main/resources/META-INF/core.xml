@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd 
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+  <context:component-scan base-package="com.github.mongoidgen" />
+
+  <bean
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+    <property name="properties">
+      <value>
+        startup.breather=5000
+        db.name=
+        db.user=
+        db.password=
+        mongo.master.host=localhost
+        datastore.replicas=
+        id.root.prefix=11610
+        idcache.capacity=5000
+        idcache.rejuvenator.frequency=45000
+      </value>
+    </property>
+  </bean>
+
+  <bean id="idgen-configuration" class="com.github.mongoidgen.conf.Configuration"
+    scope="singleton">
+    <property name="startupBreather" value="${startup.breather}" />
+    <property name="dataStoreName" value="${db.name}" />
+    <property name="dataStoreUsername" value="${db.user}" />
+    <property name="dataStorePassword" value="${db.password}" />
+    <property name="dataStoreReplicas" value="${datastore.replicas}" />
+    <property name="idRootPrefix" value="${id.root.prefix}" />
+    <property name="idCacheCapacity" value="${idcache.capacity}" />
+    <property name="idCacheRejuvenatorFreqMillis" value="${idcache.rejuvenator.frequency}" />
+  </bean>
+
+  <bean id="idgen-appContext" class="com.github.mongoidgen.conf.AppContext" />
+
+  <!-- Select either option based on need and comment the other -->
+  <bean id="mongoIdgen" class="com.github.mongoidgen.service.MongoIdGeneratorService"
+    scope="singleton" init-method="start" destroy-method="stop">
+    <property name="configuration" ref="idgen-configuration" />
+    <property name="mongo" ref="mongo" />
+  </bean>
+  <bean id="inMemoryIdgen"
+    class="com.github.mongoidgen.service.InMemoryIdGeneratorService"
+    scope="singleton" />
+</beans>
