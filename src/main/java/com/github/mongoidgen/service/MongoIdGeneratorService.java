@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.SmartLifecycle;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -16,7 +17,7 @@ import com.mongodb.Mongo;
 import com.github.mongoidgen.conf.Configuration;
 import com.github.mongoidgen.service.Utils.StringUtils;
 
-public class MongoIdGeneratorService implements IdGeneratorService<String> {
+public class MongoIdGeneratorService implements IdGeneratorService<String>, SmartLifecycle {
     private static final Logger logger = LoggerFactory.getLogger(MongoIdGeneratorService.class);
 
     private final ConcurrentLinkedQueue<String> idCache = new ConcurrentLinkedQueue<String>();
@@ -173,5 +174,28 @@ public class MongoIdGeneratorService implements IdGeneratorService<String> {
     @Required
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return !shutdown;
+    }
+
+    @Override
+    public int getPhase() {
+        return 0;
+    }
+
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
+
+    @Override
+    public void stop(Runnable runnable) {
+        stop();
+        if (runnable != null) {
+            runnable.run();
+        }
     }
 }

@@ -4,8 +4,9 @@
 Mongo Id Generator Service provides its consumers with fast, globally-unique and sparse id's.  
 
 ## Using the Service
-The API is super simple and there's a single method that callers can invoke: generateId()  
-The service can be scaled out as needed simply by speeding up id cache rejuvenation frequency and beefing up the id cache size. If even that is not sufficient, the backing datastore can be beefed up (shardng + replicasets) but I believe that won't be necessary.  
+The API is super simple and there's a single method that callers can invoke: generateId() which generates a 16-digit id.  
+
+The service can be scaled out as needed simply by speeding up id cache rejuvenation frequency and beefing up the id cache size. If even that is not sufficient, the backing datastore can be beefed up (shardng + replicasets) but I believe that won't be necessary. After the service does cache-priming to its default size of 5000, service consumers can pull a 1000 id's in less than 5 milliseconds.  
 
 The Id root prefix is set to '11610' by default but is configurable via the id.root.prefix property in core.xml.  
 
